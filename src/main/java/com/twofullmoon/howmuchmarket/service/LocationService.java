@@ -19,6 +19,10 @@ public class LocationService {
 		return locationRepository.save(location);
 	}
 	
+	public Location saveLocation(Location location) {
+		return locationRepository.save(location);
+	}
+	
 	public Optional<Location> findLocationById(Long id) {
 		return locationRepository.findById(id);
 	}
