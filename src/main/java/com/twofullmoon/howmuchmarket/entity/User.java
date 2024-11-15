@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
 
 @Entity
 @Table(name = "User")
@@ -32,4 +33,7 @@ public class User {
 	@ManyToOne
 	@JoinColumn(name = "Location_id", nullable = false)
 	private Location location;
+	
+	@OneToMany(mappedBy = "user")
+    private List<Product> products; //상품 추가
 }
