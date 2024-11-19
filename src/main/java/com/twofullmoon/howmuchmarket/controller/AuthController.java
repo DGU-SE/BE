@@ -31,9 +31,10 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<UserLoginResponseDTO> login(@RequestBody UserLoginRequestDTO request) {
 		if (request.getPassword() == null || request.getId() == null) {
-	        return ResponseEntity.badRequest().body(null);
-	    }
-		
+			return ResponseEntity.badRequest()
+					.body(null);
+		}
+
 		User user = userService.findUserById(request.getId())
 				.orElseThrow(() -> new InvalidUserInformationException("Invalid username or password"));
 
