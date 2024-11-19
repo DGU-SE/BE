@@ -3,7 +3,6 @@ package com.twofullmoon.howmuchmarket.controller;
 import com.twofullmoon.howmuchmarket.dto.AuctionDTO;
 import com.twofullmoon.howmuchmarket.dto.BidDTO;
 import com.twofullmoon.howmuchmarket.entity.Bid;
-import com.twofullmoon.howmuchmarket.mapper.BidMapper;
 import com.twofullmoon.howmuchmarket.service.AuctionService;
 import com.twofullmoon.howmuchmarket.service.BidService;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +16,10 @@ import java.util.stream.Collectors;
 public class AuctionController {
     private final AuctionService auctionService;
     private final BidService bidService;
-    private final BidMapper bidMapper;
 
-    public AuctionController(AuctionService auctionService, BidService bidService, BidMapper bidMapper) {
+    public AuctionController(AuctionService auctionService, BidService bidService) {
         this.auctionService = auctionService;
         this.bidService = bidService;
-        this.bidMapper = bidMapper;
     }
 
     @PostMapping("/create")
@@ -43,6 +40,6 @@ public class AuctionController {
     public ResponseEntity<List<BidDTO>> getBidsByUserId(@PathVariable(name = "userId") String userId) {
         List<Bid> bids = bidService.getBidsByUser(userId);
 
-        return ResponseEntity.ok(bids.stream().map(bid -> bidMapper.toDTO(bid, true)).collect(Collectors.toList()));
+        return ResponseEntity.ok(bids.stream().map(bid -> bidService.getBidDTO(bid, true, true)).collect(Collectors.toList()));
     }
 }

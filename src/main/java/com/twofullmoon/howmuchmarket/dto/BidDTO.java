@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -15,5 +14,6 @@ public class BidDTO {
     private Integer amount;
     private String userId;
     private Integer auctionId;
-    private Optional<ProductDTO> product;
+    private ProductDTO product = null;
+    private String auctionWinner = null;
 }
