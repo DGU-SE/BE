@@ -14,8 +14,14 @@ import java.time.LocalDateTime;
 @Builder
 public class Product {
 
+<<<<<<< HEAD
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+=======
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+>>>>>>> dev
     private Integer id;
 
     @Column(name = "name", nullable = false, length = 100)
@@ -34,7 +40,11 @@ public class Product {
     private String locationName;
 
     @Column(name = "product_status", nullable = false, length = 45)
+<<<<<<< HEAD
     private String productStatus;
+=======
+    private String productStatus = "unsold";
+>>>>>>> dev
 
     @Column(name = "product_detail", nullable = false, length = 700)
     private String productDetail;
@@ -45,4 +55,8 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
     private User user;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> dev

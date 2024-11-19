@@ -9,5 +9,4 @@ public class HowmuchmarketApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HowmuchmarketApplication.class, args);
 	}
-
 }
