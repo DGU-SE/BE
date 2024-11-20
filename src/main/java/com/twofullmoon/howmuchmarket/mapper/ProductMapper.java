@@ -21,6 +21,8 @@ public class ProductMapper {
                 .productDetail(product.getProductDetail())
                 .onAuction(product.getOnAuction())
                 .userId(product.getUser().getId())
+                .longitude(product.getLongitude())
+                .latitude(product.getLatitude()) 
                 .build();
     }
 }

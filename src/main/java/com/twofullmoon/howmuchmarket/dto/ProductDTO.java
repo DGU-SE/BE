@@ -22,4 +22,6 @@ public class ProductDTO {
     private String productDetail;
     private Boolean onAuction;
     private String userId;
+    private Double longitude;
+    private Double latitude; 
 }

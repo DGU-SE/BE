@@ -28,4 +28,17 @@ public class ProductController {
         List<Product> products = productService.getProductsByUserId(userId);
         return ResponseEntity.ok(products);
     }
+    
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam Double latitude,
+            @RequestParam Double longitude,
+            @RequestParam Integer lowBound,
+            @RequestParam Integer upBound,
+            @RequestParam String productStatus
+    ) {
+        List<Product> products = productService.searchProducts(keyword, latitude, longitude, lowBound, upBound, productStatus);
+        return ResponseEntity.ok(products);
+    }
 }
