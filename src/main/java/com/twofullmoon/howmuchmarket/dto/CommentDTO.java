@@ -12,4 +12,12 @@ public class CommentDTO {
     private String userId;
     private String content;
     private boolean isSecret;
+    
+    public String getUserId() {
+        return userId;
+    }
+
+    public Integer getProductId() {
+        return productId;
+    }
 }

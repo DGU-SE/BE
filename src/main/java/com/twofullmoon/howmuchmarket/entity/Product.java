@@ -42,8 +42,18 @@ public class Product {
 
     @Column(name = "on_auction", nullable = false)
     private Boolean onAuction;
+    
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
+
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
 
     @ManyToOne
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
     private User user;
+    
+    public User getUser() {
+        return user;
+    }
 }
