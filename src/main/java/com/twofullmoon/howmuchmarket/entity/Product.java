@@ -52,4 +52,8 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
     private User user;
+    
+    public User getUser() {
+        return user;
+    }
 }

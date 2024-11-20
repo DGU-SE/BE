@@ -14,6 +14,10 @@ public class ProductService {
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
+    
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
+    }
 
     // 특정 사용자의 상품 목록 조회
     public List<Product> getProductsByUserId(String userId) {
