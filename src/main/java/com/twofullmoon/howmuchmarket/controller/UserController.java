@@ -1,17 +1,11 @@
 package com.twofullmoon.howmuchmarket.controller;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.twofullmoon.howmuchmarket.dto.LocationDTO;
 import com.twofullmoon.howmuchmarket.dto.UserResponseDTO;
@@ -37,6 +31,16 @@ public class UserController {
     public Optional<UserResponseDTO> getUserById(@PathVariable(name = "id") String id) {
         return userService.findUserById(id)
                 .map(userMapper::toResponseDTO);
+    }
+
+    @GetMapping("/id/duplicate")
+    public ResponseEntity<HashMap<String, Boolean>> checkDuplicateId(@RequestParam(name = "id") String id) {
+        boolean isDuplicated = userService.findUserById(id).isPresent();
+
+        HashMap<String, Boolean> response = new HashMap<>();
+        response.put("duplicated", isDuplicated);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/join")

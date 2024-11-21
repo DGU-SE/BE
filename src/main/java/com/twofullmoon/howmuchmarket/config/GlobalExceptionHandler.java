@@ -10,10 +10,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.twofullmoon.howmuchmarket.exception.UserLocationNullException;
 import com.twofullmoon.howmuchmarket.exception.UserAlreadyExistsException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<String> handleMultipartException(MultipartException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<String> handleMissingRequestHeaderException(MissingRequestHeaderException e) {

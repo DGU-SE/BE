@@ -1,5 +1,6 @@
 package com.twofullmoon.howmuchmarket.dto;
 
+import com.twofullmoon.howmuchmarket.entity.ProductPicture;
 import com.twofullmoon.howmuchmarket.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,5 +25,6 @@ public class ProductDTO {
     private Boolean onAuction;
     private String userId;
     private Double longitude;
-    private Double latitude; 
+    private Double latitude;
+    private List<ProductPictureDTO> productPictures;
 }

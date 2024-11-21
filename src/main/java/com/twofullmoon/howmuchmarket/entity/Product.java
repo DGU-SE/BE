@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Product")
@@ -35,7 +36,7 @@ public class Product {
     private String locationName;
 
     @Column(name = "product_status", nullable = false, length = 45)
-    private String productStatus = "unsold";
+    private String productStatus = "unsold"; // "unsold", "sold", "auction_ended"
 
     @Column(name = "product_detail", nullable = false, length = 700)
     private String productDetail;
@@ -52,8 +53,13 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
     private User user;
-    
-    public User getUser() {
-        return user;
-    }
+
+    @OneToMany(mappedBy="product", cascade=CascadeType.ALL, orphanRemoval = true)
+    private List<ProductPicture> productPictures;
+
+    @OneToMany(mappedBy="product", cascade=CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions;
+
+    @OneToOne(mappedBy="product", cascade=CascadeType.ALL, orphanRemoval = true)
+    private Auction auction;
 }

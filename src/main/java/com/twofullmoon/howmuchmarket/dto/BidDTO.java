@@ -1,15 +1,15 @@
 package com.twofullmoon.howmuchmarket.dto;
 
 import com.twofullmoon.howmuchmarket.entity.Bid;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Optional;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class BidDTO {
     private Integer amount;
     private String userId;
