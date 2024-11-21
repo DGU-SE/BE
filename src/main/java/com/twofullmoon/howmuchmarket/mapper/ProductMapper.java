@@ -47,6 +47,10 @@ public class ProductMapper {
 
 
     public ProductDTO toDTO(Product product, List<ProductPictureDTO> productPictures) {
+        return toDTO(product, productPictures, null);
+    }
+
+    public ProductDTO toDTO(Product product, List<ProductPictureDTO> productPictures, Double distanceKiloMeter) {
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -59,6 +63,7 @@ public class ProductMapper {
                 .userId(product.getUser().getId())
                 .locationId(product.getLocation().getId())
                 .productPictures(productPictures)
+                .distanceKiloMeter(distanceKiloMeter)
                 .build();
     }
 }

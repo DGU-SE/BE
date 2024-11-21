@@ -15,6 +15,7 @@ import com.twofullmoon.howmuchmarket.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,12 +45,30 @@ public class BidService {
     }
 
     public BidDTO getBidDTO(Bid bid, boolean includeProduct, boolean includeAuctionWinner) {
+        return getBidDTO(bid, includeProduct, includeAuctionWinner, false);
+    }
+
+    public BidDTO getBidDTO(Bid bid, boolean includeProduct, boolean includeAuctionWinner, boolean includeAuctionWinnerAmount) {
         String auctionWinnerId = includeAuctionWinner ? auctionService.getAuctionWinner(bid.getAuction().getId()).getId() : null;
         List<ProductPictureDTO> productPictureDTOs = bid.getAuction().getProduct().getProductPictures().stream()
                 .map(productPictureMapper::toDTO)
                 .toList();
         ProductDTO productDTO = includeProduct ? productMapper.toDTO(bid.getAuction().getProduct(), productPictureDTOs) : null;
-        return bidMapper.toDTO(bid, Optional.ofNullable(productDTO), Optional.ofNullable(auctionWinnerId));
+        Integer auctionWinnerAmount = includeAuctionWinnerAmount ? bid.getAuction().getCurrentPrice() : null;
+        return bidMapper.toDTO(bid, Optional.ofNullable(productDTO), Optional.ofNullable(auctionWinnerId), Optional.ofNullable(auctionWinnerAmount));
+    }
+
+    public List<BidDTO> getMergedBidsByHighestAmount(String userId) {
+        return getBidsByUser(userId).stream()
+                .map(bid -> getBidDTO(bid, true, true, true))
+                .collect(Collectors.groupingBy(
+                        bid -> bid.getProduct().getId(),
+                        Collectors.maxBy(Comparator.comparingInt(BidDTO::getAmount))
+                ))
+                .values()
+                .stream()
+                .flatMap(Optional::stream)
+                .toList();
     }
 
     @Transactional

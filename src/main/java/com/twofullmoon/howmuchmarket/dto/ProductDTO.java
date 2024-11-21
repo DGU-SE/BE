@@ -25,4 +25,5 @@ public class ProductDTO {
     private String userId;
     private long locationId;
     private List<ProductPictureDTO> productPictures;
+    private Double distanceKiloMeter;
 }

@@ -22,6 +22,11 @@ public class AuctionController {
         this.bidService = bidService;
     }
 
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<AuctionDTO> getAuctionByProductId(@PathVariable(name = "productId") int productId) {
+        return ResponseEntity.ok(auctionService.getAuctionByProductId(productId));
+    }
+
     @PostMapping("/create")
     public ResponseEntity<String> createAuction(@RequestBody AuctionDTO auctionDTO) {
         auctionService.createAuction(auctionDTO);
@@ -38,8 +43,6 @@ public class AuctionController {
 
     @GetMapping("/bid/{userId}")
     public ResponseEntity<List<BidDTO>> getBidsByUserId(@PathVariable(name = "userId") String userId) {
-        List<Bid> bids = bidService.getBidsByUser(userId);
-
-        return ResponseEntity.ok(bids.stream().map(bid -> bidService.getBidDTO(bid, true, true)).collect(Collectors.toList()));
+        return ResponseEntity.ok(bidService.getMergedBidsByHighestAmount(userId));
     }
 }
