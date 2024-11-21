@@ -35,7 +35,7 @@ public class Product {
 //    private String locationName;
 
     @Column(name = "product_status", nullable = false, length = 45)
-    private String productStatus = "unsold";
+    private String productStatus;
 
     @Column(name = "product_detail", nullable = false, length = 700)
     private String productDetail;
@@ -48,19 +48,14 @@ public class Product {
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
     private User user;
     
-//    public User getUser() {
-//        return user;
-//    }
-    
-    
-//    @Column(name = "longitude", nullable = false)
-//    private Double longitude;
-//
-//    @Column(name = "latitude", nullable = false)
-//    private Double latitude;
     
     @ManyToOne
     @JoinColumn(name = "Location_id", referencedColumnName = "id", nullable = false)
     private Location location;
     
+    @PrePersist
+    protected void onCreate() {
+        this.regTime = LocalDateTime.now();
+        this.productStatus = "unsold";
+    }
 }

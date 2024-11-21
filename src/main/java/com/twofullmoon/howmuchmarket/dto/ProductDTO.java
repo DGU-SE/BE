@@ -17,7 +17,6 @@ public class ProductDTO {
     private Integer price;
     private LocalDateTime regTime;
     private LocalDateTime dealTime;
-    private String locationName;
     private String productStatus;
     private String productDetail;
     private Boolean onAuction;

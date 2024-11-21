@@ -1,11 +1,17 @@
 package com.twofullmoon.howmuchmarket.controller;
 
+import com.twofullmoon.howmuchmarket.dto.ProductDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductRequestDTO; // ProductRequest 추가
 import com.twofullmoon.howmuchmarket.entity.Location;
 import com.twofullmoon.howmuchmarket.entity.Product;
+import com.twofullmoon.howmuchmarket.entity.User;
+import com.twofullmoon.howmuchmarket.mapper.ProductMapper;
 import com.twofullmoon.howmuchmarket.service.LocationService; // LocationService 추가
 import com.twofullmoon.howmuchmarket.service.ProductService;
+import com.twofullmoon.howmuchmarket.service.UserService;
 import com.twofullmoon.howmuchmarket.util.JwtUtil;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +25,15 @@ public class ProductController {
     private final ProductService productService;
     private final LocationService locationService; // LocationService 의존성 추가
     private final JwtUtil jwtUtil;
+    private final UserService userService;
+    private final ProductMapper productMapper;
 
-    public ProductController(ProductService productService, LocationService locationService, JwtUtil jwtUtil) {
+    public ProductController(ProductService productService, LocationService locationService, JwtUtil jwtUtil, UserService userService, ProductMapper productMapper) {
         this.productService = productService;
         this.locationService = locationService;
         this.jwtUtil = jwtUtil;
+        this.userService = userService;
+        this.productMapper = productMapper;
     }
 
     // 올린 상품 목록 조회
@@ -50,34 +60,20 @@ public class ProductController {
     }
     
     // 상품 등록
-    @PostMapping("/products")
-    public ResponseEntity<Product> createProduct(@RequestHeader("Authorization") String token,
+    @PostMapping
+    public ResponseEntity<ProductDTO> createProduct(@RequestHeader("Authorization") String token,
             @RequestBody ProductRequestDTO request) 
     {
-
-    	User user = userService.findUserById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+    	String userId = jwtUtil.extractUserId(token.replace("Bearer ", ""));
     	
-        // Location ID로 Location 조회
-        Location location = locationService.findLocationById(request.getLocationId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid location ID"));
-        
-        // Product 생성
-        Product product = Product.builder()
-                .name(request.getName())
-                .price(request.getPrice())
-                .dealTime(request.getDealTime())
-                .location(location) // Location 설정
-                .productDetail(request.getProductDetail())
-                .onAuction(request.getOnAuction())
-                .productStatus("unsold")
-                .regTime(LocalDateTime.now()) // 자동 설정
-                .build();
-        
-        // Product 저장
-        productService.save(product);
-        return ResponseEntity.ok(product);
+    	if (!userId.equals(request.getUserId())) {
+    		throw new IllegalArgumentException("userId in token and request body are not same");
+    	}
+    	
+    	Product product = productService.createProduct(request);
+    	ProductDTO productDTO = productMapper.toDTO(product);
+    	
+    	return ResponseEntity.status(HttpStatus.CREATED).body(productDTO);
     }
 
-    // 추가적으로 필요한 API는 요청에 따라 구현 가능
 }
