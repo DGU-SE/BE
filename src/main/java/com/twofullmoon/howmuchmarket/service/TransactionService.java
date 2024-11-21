@@ -4,7 +4,6 @@ import com.twofullmoon.howmuchmarket.dto.TransactionDTO;
 import com.twofullmoon.howmuchmarket.entity.Product;
 import com.twofullmoon.howmuchmarket.entity.Transaction;
 import com.twofullmoon.howmuchmarket.entity.User;
-import com.twofullmoon.howmuchmarket.mapper.ProductMapper;
 import com.twofullmoon.howmuchmarket.mapper.TransactionMapper;
 import com.twofullmoon.howmuchmarket.repository.ProductRepository;
 import com.twofullmoon.howmuchmarket.repository.TransactionRepository;
@@ -13,7 +12,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -22,21 +20,21 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final AuctionService auctionService;
     private final TransactionMapper transactionMapper;
-    private final ProductMapper productMapper;
+    private final ProductService productService;
 
-    public TransactionService(TransactionRepository transactionRepository, ProductRepository productRepository, UserRepository userRepository, AuctionService auctionService, TransactionMapper transactionMapper, ProductMapper productMapper) {
+    public TransactionService(TransactionRepository transactionRepository, ProductRepository productRepository, UserRepository userRepository, AuctionService auctionService, TransactionMapper transactionMapper, ProductService productService) {
         this.transactionRepository = transactionRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
         this.auctionService = auctionService;
         this.transactionMapper = transactionMapper;
-        this.productMapper = productMapper;
+        this.productService = productService;
     }
 
     public TransactionDTO getTransactionDTO(Transaction transaction, boolean includeProduct) {
         TransactionDTO transactionDTO = transactionMapper.toDTO(transaction);
         if (includeProduct) {
-            transactionDTO.setProduct(productMapper.toDTO(transaction.getProduct()));
+            transactionDTO.setProduct(productService.getProductDTO(transaction.getProduct(), true));
         }
         return transactionDTO;
     }
@@ -45,7 +43,7 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findByBuyerId(userId);
         return transactions.stream()
                 .map(transaction -> getTransactionDTO(transaction, includeProduct))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
