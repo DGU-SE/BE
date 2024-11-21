@@ -43,7 +43,7 @@ public class Product {
 
     @Column(name = "on_auction", nullable = false)
     private Boolean onAuction;
-    
+
 
     @ManyToOne
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
@@ -52,19 +52,19 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "Location_id", referencedColumnName = "id", nullable = false)
     private Location location;
-    
+
     @PrePersist
     protected void onCreate() {
         this.regTime = LocalDateTime.now();
         this.productStatus = "unsold";
     }
 
-    @OneToMany(mappedBy="product", cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductPicture> productPictures;
 
-    @OneToMany(mappedBy="product", cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions;
 
-    @OneToOne(mappedBy="product", cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Auction auction;
 }

@@ -2,6 +2,7 @@ package com.twofullmoon.howmuchmarket.mapper;
 
 import com.twofullmoon.howmuchmarket.dto.LocationDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductDTO;
+import com.twofullmoon.howmuchmarket.dto.ProductRequestDTO;
 import com.twofullmoon.howmuchmarket.entity.Location;
 import com.twofullmoon.howmuchmarket.entity.User;
 import com.twofullmoon.howmuchmarket.dto.ProductPictureDTO;
@@ -16,18 +17,19 @@ import java.util.List;
 public class ProductMapper {
 
     public ProductDTO toDTO(Product product) {
-        return ProductDTO.builder()
-        		.id(product.getId())
-        		.regTime(product.getRegTime())
-                .name(product.getName())
-                .price(product.getPrice())
-                .dealTime(product.getDealTime())
-                .productStatus(product.getProductStatus())
-                .productDetail(product.getProductDetail())
-                .onAuction(product.getOnAuction())
-                .userId(product.getUser().getId())
-                .locationId(product.getLocation().getId())
-                .build();
+        return toDTO(product, null);
+//        return ProductDTO.builder()
+//        		.id(product.getId())
+//        		.regTime(product.getRegTime())
+//                .name(product.getName())
+//                .price(product.getPrice())
+//                .dealTime(product.getDealTime())
+//                .productStatus(product.getProductStatus())
+//                .productDetail(product.getProductDetail())
+//                .onAuction(product.getOnAuction())
+//                .userId(product.getUser().getId())
+//                .locationId(product.getLocation().getId())
+//                .build();
     }
 
 
@@ -41,8 +43,6 @@ public class ProductMapper {
                 .user(user)
                 .location(location)
                 .build();
-    
-    	
     }
 
 
