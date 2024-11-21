@@ -1,9 +1,6 @@
 package com.twofullmoon.howmuchmarket.service;
 
-import com.twofullmoon.howmuchmarket.dto.LocationDTO;
-import com.twofullmoon.howmuchmarket.dto.ProductDTO;
-import com.twofullmoon.howmuchmarket.dto.ProductPictureDTO;
-import com.twofullmoon.howmuchmarket.dto.ProductRequestDTO;
+import com.twofullmoon.howmuchmarket.dto.*;
 import com.twofullmoon.howmuchmarket.entity.Location;
 import com.twofullmoon.howmuchmarket.entity.Product;
 import com.twofullmoon.howmuchmarket.entity.ProductPicture;
@@ -15,7 +12,11 @@ import com.twofullmoon.howmuchmarket.repository.LocationRepository;
 import com.twofullmoon.howmuchmarket.repository.ProductPictureRepository;
 import com.twofullmoon.howmuchmarket.repository.ProductRepository;
 import com.twofullmoon.howmuchmarket.repository.UserRepository;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,15 +65,65 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    public ProductDTO getProductDTO(Product product, boolean includeProductPictures) {
+        List<ProductPictureDTO> productPictureDTOs = includeProductPictures ? product.getProductPictures().stream()
+                .map(productPictureMapper::toDTO)
+                .toList() : null;
+        return productMapper.toDTO(product, productPictureDTOs);
+    }
 
-    // 특정 사용자의 상품 목록 조회
-    public List<Product> getProductsByUserId(String userId) {
-        return productRepository.findByUserId(userId);
+    public List<ProductDTO> getProductsByUserId(String userId) {
+        return productRepository.findByUserId(userId).stream().map(product -> {
+            return getProductDTO(product, true);
+        }).toList();
     }
 
     // 상품 검색 기능	
-    public List<Product> searchProducts(String keyword, Double latitude, Double longitude, Integer lowBound, Integer upBound, String productStatus) {
-        return productRepository.searchProducts(keyword, latitude, longitude, lowBound, upBound, productStatus);
+    public List<ProductDTO> searchProducts(ProductSearchCriteriaDTO criteria) {
+        Specification<Product> spec = Specification.where(null);
+
+        if (criteria.getKeyword() != null && !criteria.getKeyword().isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(root.get("name"), "%" + criteria.getKeyword() + "%"));
+        }
+
+        if (criteria.getLatitude() != null && criteria.getLongitude() != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> {
+                Join<Product, Location> locationJoin = root.join("location");
+
+                // Haversine formula calculation using database function
+                Expression<Double> distance = criteriaBuilder.function(
+                        "calculate_distance",
+                        Double.class,
+                        locationJoin.get("latitude"),
+                        locationJoin.get("longitude"),
+                        criteriaBuilder.literal(criteria.getLatitude()),
+                        criteriaBuilder.literal(criteria.getLongitude())
+                );
+
+                // Radius condition
+                return criteriaBuilder.lessThanOrEqualTo(distance, 30.0);
+            });
+        }
+
+        if (criteria.getLowBound() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), criteria.getLowBound()));
+        }
+
+        if (criteria.getUpBound() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), criteria.getUpBound()));
+        }
+
+        if (criteria.getProductStatus() != null && !criteria.getProductStatus().isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("productStatus"), criteria.getProductStatus()));
+        }
+
+        return productRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "regTime")).stream()
+                .map(product -> getProductDTO(product, true))
+                .toList();
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package com.twofullmoon.howmuchmarket.controller;
 
 import com.twofullmoon.howmuchmarket.dto.ProductDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductRequestDTO;
+import com.twofullmoon.howmuchmarket.dto.ProductSearchCriteriaDTO;
 import com.twofullmoon.howmuchmarket.entity.Product;
 import com.twofullmoon.howmuchmarket.mapper.ProductMapper;
 import com.twofullmoon.howmuchmarket.service.LocationService;
@@ -39,24 +40,17 @@ public class ProductController {
 
     // 올린 상품 목록 조회
     @GetMapping("/my")
-    public ResponseEntity<List<Product>> getMyProducts(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<ProductDTO>> getMyProducts(@RequestHeader("Authorization") String token) {
         // JWT에서 userId 추출
         String userId = jwtUtil.extractUserId(token.replace("Bearer ", ""));
-        List<Product> products = productService.getProductsByUserId(userId);
+        List<ProductDTO> products = productService.getProductsByUserId(userId);
         return ResponseEntity.ok(products);
     }
 
     // 상품 검색
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProducts(
-            @RequestParam String keyword,
-            @RequestParam Double latitude,
-            @RequestParam Double longitude,
-            @RequestParam Integer lowBound,
-            @RequestParam Integer upBound,
-            @RequestParam String productStatus
-    ) {
-        List<Product> products = productService.searchProducts(keyword, latitude, longitude, lowBound, upBound, productStatus);
+    public ResponseEntity<List<ProductDTO>> searchProducts(@ModelAttribute ProductSearchCriteriaDTO criteria) {
+        List<ProductDTO> products = productService.searchProducts(criteria);
         return ResponseEntity.ok(products);
     }
 
