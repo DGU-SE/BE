@@ -18,6 +18,7 @@ public class ProductService {
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
+    
 
     // 특정 사용자의 상품 목록 조회
     public List<Product> getProductsByUserId(String userId) {
@@ -29,6 +30,9 @@ public class ProductService {
     	return productRepository.searchProducts(keyword, latitude, longitude, lowBound, upBound, productStatus);
     }
     
+    public Product save(Product product) {
+        return productRepository.save(product);
+    }
     
 }
 
