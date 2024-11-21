@@ -10,6 +10,7 @@ import com.twofullmoon.howmuchmarket.mapper.ProductMapper;
 import com.twofullmoon.howmuchmarket.repository.AuctionRepository;
 import com.twofullmoon.howmuchmarket.repository.BidRepository;
 import com.twofullmoon.howmuchmarket.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class BidService {
         return bidMapper.toDTO(bid, Optional.ofNullable(productDTO), Optional.ofNullable(auctionWinnerId));
     }
 
+    @Transactional
     public void createBid(String userId, int auctionId, int amount) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
