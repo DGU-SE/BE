@@ -36,7 +36,7 @@ public class Auction {
     @Column(name = "status", nullable = false, length = 20)
     private String status = "ongoing"; // "ongoing", "ended"
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id", nullable = false)
     private Product product;
 

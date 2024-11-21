@@ -2,14 +2,15 @@ package com.twofullmoon.howmuchmarket.mapper;
 
 import com.twofullmoon.howmuchmarket.dto.LocationDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductDTO;
-import com.twofullmoon.howmuchmarket.dto.ProductRequestDTO;
 import com.twofullmoon.howmuchmarket.entity.Location;
-import com.twofullmoon.howmuchmarket.entity.Product;
 import com.twofullmoon.howmuchmarket.entity.User;
-
+import com.twofullmoon.howmuchmarket.dto.ProductPictureDTO;
+import com.twofullmoon.howmuchmarket.entity.Product;
+import com.twofullmoon.howmuchmarket.entity.ProductPicture;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class ProductMapper {
@@ -44,4 +45,20 @@ public class ProductMapper {
     	
     }
 
+
+    public ProductDTO toDTO(Product product, List<ProductPictureDTO> productPictures) {
+        return ProductDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .regTime(product.getRegTime())
+                .dealTime(product.getDealTime())
+                .productStatus(product.getProductStatus())
+                .productDetail(product.getProductDetail())
+                .onAuction(product.getOnAuction())
+                .userId(product.getUser().getId())
+                .locationId(product.getLocation().getId())
+                .productPictures(productPictures)
+                .build();
+    }
 }
