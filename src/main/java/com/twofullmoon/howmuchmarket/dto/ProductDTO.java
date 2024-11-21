@@ -19,12 +19,10 @@ public class ProductDTO {
     private Integer price;
     private LocalDateTime regTime;
     private LocalDateTime dealTime;
-    private String locationName;
     private String productStatus;
     private String productDetail;
     private Boolean onAuction;
     private String userId;
-    private Double longitude;
-    private Double latitude;
+    private long locationId;
     private List<ProductPictureDTO> productPictures;
 }

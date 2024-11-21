@@ -1,5 +1,18 @@
 package com.twofullmoon.howmuchmarket.service;
 
+import com.twofullmoon.howmuchmarket.dto.LocationDTO;
+import com.twofullmoon.howmuchmarket.dto.ProductRequestDTO;
+import com.twofullmoon.howmuchmarket.dto.UserResponseDTO;
+import com.twofullmoon.howmuchmarket.entity.Location;
+import com.twofullmoon.howmuchmarket.entity.Product;
+import com.twofullmoon.howmuchmarket.entity.User;
+import com.twofullmoon.howmuchmarket.mapper.LocationMapper;
+import com.twofullmoon.howmuchmarket.mapper.ProductMapper;
+import com.twofullmoon.howmuchmarket.mapper.UserMapper;
+import com.twofullmoon.howmuchmarket.repository.LocationRepository;
+import com.twofullmoon.howmuchmarket.repository.ProductRepository;
+import com.twofullmoon.howmuchmarket.repository.UserRepository;
+
 import com.twofullmoon.howmuchmarket.dto.ProductDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductPictureDTO;
 import com.twofullmoon.howmuchmarket.entity.Product;
@@ -27,17 +40,35 @@ public class ProductService {
     private final ProductPictureRepository productPictureRepository;
     private final ProductMapper productMapper;
     private final ProductPictureMapper productPictureMapper;
+    private final LocationRepository locationRepository;
+    private final LocationMapper locationMapper;
+    private final UserRepository userRepository;
 
-    public ProductService(ProductRepository productRepository, ProductPictureRepository productPictureRepository, ProductMapper productMapper, ProductPictureMapper productPictureMapper) {
+    public ProductService(ProductRepository productRepository, ProductPictureRepository productPictureRepository, ProductMapper productMapper, ProductPictureMapper productPictureMapper, LocationRepository locationRepository, LocationMapper locationMapper, UserRepository userRepository) {
         this.productRepository = productRepository;
         this.productPictureRepository = productPictureRepository;
         this.productMapper = productMapper;
         this.productPictureMapper = productPictureMapper;
+        this.locationRepository = locationRepository;
+        this.locationMapper = locationMapper;
+        this.userRepository = userRepository;
     }
 
     public Product createProduct(Product product) {
         return productRepository.save(product);
+      
+    public Product createProduct(ProductRequestDTO productRequestDTO) {
+    	LocationDTO locationDTO = productRequestDTO.getLocationDTO();
+    	Location location = locationMapper.toEntity(locationDTO);
+    	
+    	locationRepository.save(location);
+    	
+    	User seller = userRepository.findById(productRequestDTO.getUserId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    	Product product = productMapper.toEntity(productRequestDTO, seller, location);
+    	
+    	return productRepository.save(product);
     }
+    
 
     // 특정 사용자의 상품 목록 조회
     public List<Product> getProductsByUserId(String userId) {
@@ -102,6 +133,10 @@ public class ProductService {
         } else {
             throw new IllegalArgumentException("File not found");
         }
+    }
+
+    public Product save(Product product) {
+        return productRepository.save(product);
     }
 }
 

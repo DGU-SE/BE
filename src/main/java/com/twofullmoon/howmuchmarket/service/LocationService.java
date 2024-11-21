@@ -23,7 +23,7 @@ public class LocationService {
         return locationRepository.save(location);
     }
 
-    public Optional<Location> findLocationById(Long id) {
+    public Optional<Location> findLocationById(long id) {
         return locationRepository.findById(id);
     }
 }

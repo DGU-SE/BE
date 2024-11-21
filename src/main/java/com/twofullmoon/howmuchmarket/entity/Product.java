@@ -32,8 +32,8 @@ public class Product {
     @Column(name = "deal_time", nullable = false)
     private LocalDateTime dealTime;
 
-    @Column(name = "location_name", nullable = false, length = 100)
-    private String locationName;
+//    @Column(name = "location_name", nullable = false, length = 100)
+//    private String locationName;
 
     @Column(name = "product_status", nullable = false, length = 45)
     private String productStatus = "unsold"; // "unsold", "sold", "auction_ended"
@@ -44,15 +44,20 @@ public class Product {
     @Column(name = "on_auction", nullable = false)
     private Boolean onAuction;
     
-    @Column(name = "longitude", nullable = false)
-    private Double longitude;
-
-    @Column(name = "latitude", nullable = false)
-    private Double latitude;
 
     @ManyToOne
     @JoinColumn(name = "User_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "Location_id", referencedColumnName = "id", nullable = false)
+    private Location location;
+    
+    @PrePersist
+    protected void onCreate() {
+        this.regTime = LocalDateTime.now();
+        this.productStatus = "unsold";
+    }
 
     @OneToMany(mappedBy="product", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<ProductPicture> productPictures;
