@@ -133,6 +133,49 @@ public class ProductService {
     public Product save(Product product) {
         return productRepository.save(product);
     }
+    
+    // 상품 수정
+    public ProductDTO updateProduct(Integer id, ProductRequestDTO productRequestDTO) {
+        // 데이터베이스에서 기존 Product 찾기
+    	 Product existingProduct = productRepository.findById(id)
+    	            .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+    	    
+    	    // Location 업데이트
+    	    LocationDTO locationDTO = productRequestDTO.getLocationDTO();
+    	    if (locationDTO != null) {
+    	        Location location = locationMapper.toEntity(locationDTO);
+    	        locationRepository.save(location); // 위치 정보 업데이트
+    	        existingProduct.setLocation(location);
+    	    }
+
+    	    // User 정보 가져오기
+    	    User seller = userRepository.findById(productRequestDTO.getUserId())
+    	            .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + productRequestDTO.getUserId()));
+
+    	    // Product 엔티티 업데이트
+    	    existingProduct.setName(productRequestDTO.getName());
+    	    existingProduct.setPrice(productRequestDTO.getPrice());
+    	    existingProduct.setDealTime(productRequestDTO.getDealTime());
+    	    existingProduct.setProductDetail(productRequestDTO.getProductDetail());
+    	    existingProduct.setOnAuction(productRequestDTO.getOnAuction());
+    	    existingProduct.setUser(seller);
+
+        // 업데이트된 Product 저장
+        Product updatedProduct = productRepository.save(existingProduct);
+
+        // DTO로 변환하여 반환
+        return productMapper.toDTO(updatedProduct);
+    }
+    
+    // 삭제 기능
+    public void deleteProduct(Integer id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+        productRepository.delete(product);
+    }
+
+
+    
 }
 
 

@@ -102,4 +102,22 @@ public class ProductController {
         ProductDTO productDTO = productService.getProduct(productId);
         return ResponseEntity.ok(productDTO);
     }
+    
+    // 상품 수정
+    @PutMapping("/alter/{id}")
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable("id") Integer id,
+            @RequestBody ProductRequestDTO productRequestDTO) {
+        ProductDTO updatedProduct = productService.updateProduct(id, productRequestDTO);
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+    // 삭제 기능 추가
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable("id") Integer id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok("Product deleted successfully.");
+    }
+
+    
 }
