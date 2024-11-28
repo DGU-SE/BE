@@ -5,12 +5,14 @@ import com.twofullmoon.howmuchmarket.dto.ProductDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductPictureDTO;
 import com.twofullmoon.howmuchmarket.entity.Auction;
 import com.twofullmoon.howmuchmarket.entity.Bid;
+import com.twofullmoon.howmuchmarket.entity.Product;
 import com.twofullmoon.howmuchmarket.entity.User;
 import com.twofullmoon.howmuchmarket.mapper.BidMapper;
 import com.twofullmoon.howmuchmarket.mapper.ProductMapper;
 import com.twofullmoon.howmuchmarket.mapper.ProductPictureMapper;
 import com.twofullmoon.howmuchmarket.repository.AuctionRepository;
 import com.twofullmoon.howmuchmarket.repository.BidRepository;
+import com.twofullmoon.howmuchmarket.repository.ProductRepository;
 import com.twofullmoon.howmuchmarket.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -29,8 +31,9 @@ public class BidService {
     private final BidMapper bidMapper;
     private final ProductMapper productMapper;
     private final ProductPictureMapper productPictureMapper;
+    private final ProductRepository productRepository;
 
-    public BidService(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository, AuctionService auctionService, BidMapper bidMapper, ProductMapper productMapper, ProductPictureMapper productPictureMapper) {
+    public BidService(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository, AuctionService auctionService, BidMapper bidMapper, ProductMapper productMapper, ProductPictureMapper productPictureMapper, ProductRepository productRepository) {
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
@@ -38,6 +41,7 @@ public class BidService {
         this.bidMapper = bidMapper;
         this.productMapper = productMapper;
         this.productPictureMapper = productPictureMapper;
+        this.productRepository = productRepository;
     }
 
     public List<Bid> getBidsByUser(String userId) {
@@ -72,11 +76,19 @@ public class BidService {
     }
 
     @Transactional
-    public void createBid(String userId, int auctionId, int amount) {
+    public BidDTO createBid(String userId, int productId, int amount) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid auction ID"));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+        if (!product.getOnAuction()) {
+            throw new IllegalArgumentException("Product is not on auction");
+        }
+        if (product.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("User cannot bid on their own product");
+        }
+
+        Auction auction = product.getAuction();
 
         if (!auction.getStatus().equals("ongoing")) {
             throw new IllegalArgumentException("Auction is not ongoing");
@@ -94,6 +106,6 @@ public class BidService {
                 .amount(amount)
                 .build();
 
-        bidRepository.save(bid);
+        return bidMapper.toDTO(bidRepository.save(bid));
     }
 }

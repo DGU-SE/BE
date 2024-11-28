@@ -2,6 +2,7 @@ package com.twofullmoon.howmuchmarket.controller;
 
 import com.twofullmoon.howmuchmarket.dto.AuctionDTO;
 import com.twofullmoon.howmuchmarket.dto.BidDTO;
+import com.twofullmoon.howmuchmarket.dto.BidRequestDTO;
 import com.twofullmoon.howmuchmarket.entity.Bid;
 import com.twofullmoon.howmuchmarket.service.AuctionService;
 import com.twofullmoon.howmuchmarket.service.BidService;
@@ -35,10 +36,10 @@ public class AuctionController {
     }
 
     @PostMapping("/bid")
-    public ResponseEntity<String> bid(@RequestBody BidDTO bidDTO) {
-        bidService.createBid(bidDTO.getUserId(), bidDTO.getAuctionId(), bidDTO.getAmount());
+    public ResponseEntity<BidDTO> bid(@RequestBody BidRequestDTO bidDTO) {
+        BidDTO bidResultDTO = bidService.createBid(bidDTO.getUserId(), bidDTO.getProductId(), bidDTO.getAmount());
 
-        return ResponseEntity.ok("Bid created successfully");
+        return ResponseEntity.ok(bidResultDTO);
     }
 
     @GetMapping("/bid/{userId}")

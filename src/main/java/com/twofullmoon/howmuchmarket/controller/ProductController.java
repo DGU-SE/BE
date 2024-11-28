@@ -1,10 +1,12 @@
 package com.twofullmoon.howmuchmarket.controller;
 
+import com.twofullmoon.howmuchmarket.dto.AuctionDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductRequestDTO;
 import com.twofullmoon.howmuchmarket.dto.ProductSearchCriteriaDTO;
 import com.twofullmoon.howmuchmarket.entity.Product;
 import com.twofullmoon.howmuchmarket.mapper.ProductMapper;
+import com.twofullmoon.howmuchmarket.service.AuctionService;
 import com.twofullmoon.howmuchmarket.service.LocationService;
 import com.twofullmoon.howmuchmarket.service.ProductService;
 import com.twofullmoon.howmuchmarket.service.UserService;
@@ -25,17 +27,15 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final LocationService locationService; // LocationService 의존성 추가
     private final JwtUtil jwtUtil;
-    private final UserService userService;
     private final ProductMapper productMapper;
+    private final AuctionService auctionService;
 
-    public ProductController(ProductService productService, LocationService locationService, JwtUtil jwtUtil, UserService userService, ProductMapper productMapper) {
+    public ProductController(ProductService productService, JwtUtil jwtUtil, ProductMapper productMapper, AuctionService auctionService) {
         this.productService = productService;
-        this.locationService = locationService;
         this.jwtUtil = jwtUtil;
-        this.userService = userService;
         this.productMapper = productMapper;
+        this.auctionService = auctionService;
     }
 
     // 올린 상품 목록 조회
@@ -66,6 +66,12 @@ public class ProductController {
 
         Product product = productService.createProduct(request);
         ProductDTO productDTO = productMapper.toDTO(product);
+
+        if (request.getOnAuction()) {
+            AuctionDTO auctionDTO = request.getAuctionDTO();
+            auctionDTO.setProductId(product.getId());
+            auctionService.createAuction(auctionDTO);
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(productDTO);
     }
