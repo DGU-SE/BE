@@ -13,14 +13,14 @@ public class CommentMapper {
                 .product(product)
                 .user(user)
                 .content(dto.getContent())
-                .isSecret(dto.isSecret())
+                .secret(dto.isSecret())
                 .build();
     }
 
     public CommentDTO toDTO(Comment comment) {
         return CommentDTO.builder()
                 .content(comment.getContent())
-                .isSecret(comment.isSecret())
+                .secret(comment.isSecret())
                 .userId(comment.getUser().getId())
                 .productId(comment.getProduct().getId())
                 .build();

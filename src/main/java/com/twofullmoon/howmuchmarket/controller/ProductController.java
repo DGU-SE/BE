@@ -11,6 +11,7 @@ import com.twofullmoon.howmuchmarket.service.LocationService;
 import com.twofullmoon.howmuchmarket.service.ProductService;
 import com.twofullmoon.howmuchmarket.service.UserService;
 import com.twofullmoon.howmuchmarket.util.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -56,6 +57,7 @@ public class ProductController {
 
     // 상품 등록
     @PostMapping
+    @Transactional
     public ResponseEntity<ProductDTO> createProduct(@RequestHeader("Authorization") String token,
                                                     @RequestBody ProductRequestDTO request) {
         String userId = jwtUtil.extractUserId(token.replace("Bearer ", ""));
@@ -69,6 +71,10 @@ public class ProductController {
 
         if (request.getOnAuction()) {
             AuctionDTO auctionDTO = request.getAuctionDTO();
+            if (auctionDTO == null) {
+                throw new IllegalArgumentException("AuctionDTO must not be null when onAuction is true");
+            }
+            auctionDTO.setStartPrice(product.getPrice());
             auctionDTO.setProductId(product.getId());
             auctionService.createAuction(auctionDTO);
         }
@@ -98,8 +104,10 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProduct(@PathVariable(name = "id") int productId) {
-        ProductDTO productDTO = productService.getProduct(productId);
+    public ResponseEntity<ProductDTO> getProduct(@PathVariable(name = "id") int productId,
+                                                 @RequestParam(required = false, name = "longitude") Double longitude,
+                                                 @RequestParam(required = false, name = "latitude") Double latitude) {
+        ProductDTO productDTO = productService.getProduct(productId, longitude, latitude);
         return ResponseEntity.ok(productDTO);
     }
     

@@ -17,13 +17,16 @@ public class ProductDTO {
     private Integer id;
     private String name;
     private Integer price;
+    private Integer currentPrice;
     private LocalDateTime regTime;
     private LocalDateTime dealTime;
     private String productStatus;
     private String productDetail;
     private Boolean onAuction;
     private String userId;
+    private String userName;
     private long locationId;
+    private String locationName;
     private List<ProductPictureDTO> productPictures;
     private Double distanceKiloMeter;
 }

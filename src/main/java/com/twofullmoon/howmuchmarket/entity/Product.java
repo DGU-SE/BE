@@ -36,7 +36,7 @@ public class Product {
 //    private String locationName;
 
     @Column(name = "product_status", nullable = false, length = 45)
-    private String productStatus = "unsold"; // "unsold", "sold", "auction_ended"
+    private String productStatus = "unsold"; // "unsold", "sold", "auction_ended", "no_bids"
 
     @Column(name = "product_detail", nullable = false, length = 700)
     private String productDetail;
@@ -58,6 +58,9 @@ public class Product {
         this.regTime = LocalDateTime.now();
         this.productStatus = "unsold";
     }
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductPicture> productPictures;

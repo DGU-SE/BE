@@ -9,6 +9,7 @@ import com.twofullmoon.howmuchmarket.mapper.AuctionMapper;
 import com.twofullmoon.howmuchmarket.mapper.BidMapper;
 import com.twofullmoon.howmuchmarket.repository.AuctionRepository;
 import com.twofullmoon.howmuchmarket.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -56,9 +57,12 @@ public class AuctionService {
         auctionRepository.save(auction);
     }
 
+    @Transactional
     public void checkAndCloseAuctions() {
         LocalDateTime now = LocalDateTime.now();
         List<Auction> ongoingAuctions = auctionRepository.findByStatus("ongoing");
+
+        System.out.println("Current time: " + now);
 
         for (Auction auction : ongoingAuctions) {
             if (auction.getEndTime().isBefore(now)) {
@@ -66,7 +70,12 @@ public class AuctionService {
                 auctionRepository.save(auction);
 
                 Product product = auction.getProduct();
-                product.setProductStatus("auction_ended");
+                if (auction.getBids().isEmpty()) {
+                    product.setProductStatus("no_bids");
+                }
+                else {
+                    product.setProductStatus("auction_ended");
+                }
                 productRepository.save(product);
             }
         }

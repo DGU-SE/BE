@@ -12,6 +12,7 @@ import com.twofullmoon.howmuchmarket.repository.LocationRepository;
 import com.twofullmoon.howmuchmarket.repository.ProductPictureRepository;
 import com.twofullmoon.howmuchmarket.repository.ProductRepository;
 import com.twofullmoon.howmuchmarket.repository.UserRepository;
+import com.twofullmoon.howmuchmarket.util.DistanceUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
@@ -196,6 +197,24 @@ public class ProductService {
         return productMapper.toDTO(product, product.getProductPictures().stream().map(productPictureMapper::toDTO).toList());
     }
 
+    public ProductDTO getProduct(int productId, Double longitude, Double latitude) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+
+        double distanceKiloMeter = DistanceUtil.calculateDistance(
+                latitude,
+                longitude,
+                product.getLocation().getLatitude(),
+                product.getLocation().getLongitude()
+        );
+
+        return productMapper.toDTO(
+                product,
+                product.getProductPictures().stream().map(productPictureMapper::toDTO).toList(),
+                distanceKiloMeter
+        );
+    }
+
     public byte[] getImage(String fileName) {
         Path filePath = Paths.get(UPLOAD_DIR).resolve(fileName);
 
@@ -220,25 +239,13 @@ public class ProductService {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
 
-        // Location 업데이트
-        LocationDTO locationDTO = productRequestDTO.getLocationDTO();
-        if (locationDTO != null) {
-            Location location = locationMapper.toEntity(locationDTO);
-            locationRepository.save(location); // 위치 정보 업데이트
-            existingProduct.setLocation(location);
+        if (existingProduct.getOnAuction() && !productRequestDTO.getPrice().equals(existingProduct.getPrice())) {
+            throw new IllegalArgumentException("Cannot change price of product on auction");
         }
 
-        // User 정보 가져오기
-        User seller = userRepository.findById(productRequestDTO.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + productRequestDTO.getUserId()));
-
-        // Product 엔티티 업데이트
         existingProduct.setName(productRequestDTO.getName());
-        existingProduct.setPrice(productRequestDTO.getPrice());
-        existingProduct.setDealTime(productRequestDTO.getDealTime());
         existingProduct.setProductDetail(productRequestDTO.getProductDetail());
-        existingProduct.setOnAuction(productRequestDTO.getOnAuction());
-        existingProduct.setUser(seller);
+        existingProduct.setPrice(productRequestDTO.getPrice());
 
         // 업데이트된 Product 저장
         Product updatedProduct = productRepository.save(existingProduct);
