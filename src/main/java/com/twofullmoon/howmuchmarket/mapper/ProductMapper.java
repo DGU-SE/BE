@@ -47,18 +47,26 @@ public class ProductMapper {
 
 
     public ProductDTO toDTO(Product product, List<ProductPictureDTO> productPictures) {
+        return toDTO(product, productPictures, null);
+    }
+
+    public ProductDTO toDTO(Product product, List<ProductPictureDTO> productPictures, Double distanceKiloMeter) {
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
+                .currentPrice(product.getAuction() != null ? product.getAuction().getCurrentPrice() : product.getPrice())
                 .regTime(product.getRegTime())
                 .dealTime(product.getDealTime())
                 .productStatus(product.getProductStatus())
                 .productDetail(product.getProductDetail())
                 .onAuction(product.getOnAuction())
                 .userId(product.getUser().getId())
+                .userName(product.getUser().getName())
                 .locationId(product.getLocation().getId())
+                .locationName(product.getLocation().getAddress())
                 .productPictures(productPictures)
+                .distanceKiloMeter(distanceKiloMeter)
                 .build();
     }
 }

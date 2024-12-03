@@ -16,4 +16,5 @@ public class BidDTO {
     private Integer auctionId;
     private ProductDTO product = null;
     private String auctionWinner = null;
+    private Integer auctionWinnerAmount = null;
 }

@@ -17,10 +17,5 @@ public class ProductRequestDTO {
     private String productDetail;
     private Boolean onAuction;
     private String userId;
-//    private UserResponseDTO userResponseDTO;
-//	public ProductRequestDTO getProductRequestDTO() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
+    private AuctionDTO auctionDTO;
 }

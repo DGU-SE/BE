@@ -11,7 +11,7 @@ public class CommentDTO {
     private Integer productId;
     private String userId;
     private String content;
-    private boolean isSecret;
+    private boolean secret;
     
     public String getUserId() {
         return userId;

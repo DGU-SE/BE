@@ -34,7 +34,7 @@ public class Comment {
     private LocalDateTime createdAt;
 
     @Column(name = "is_secret", nullable = false)
-    private boolean isSecret = false;
+    private boolean secret = false;
 
     @PrePersist
     protected void onCreate() {

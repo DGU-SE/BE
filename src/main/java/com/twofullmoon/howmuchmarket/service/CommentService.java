@@ -47,8 +47,8 @@ public class CommentService {
         return commentRepository.findByProductId(productId).stream().map(comment -> {
             if (comment.isSecret() && !userId.equals(sellerId) && !userId.equals(comment.getUser().getId())) {
                 return CommentDTO.builder()
-                        .content("This comment is secret")
-                        .isSecret(true)
+                        .content("비밀 댓글입니다.")
+                        .secret(true)
                         .userId(comment.getUser().getId())
                         .productId(productId)
                         .build();

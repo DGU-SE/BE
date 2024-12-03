@@ -28,7 +28,6 @@ public class CommentController {
     public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO commentDTO) {
         Comment comment = commentService.createComment(commentDTO);
         CommentDTO createdCommentDTO = commentMapper.toDTO(comment);
-
         return ResponseEntity.ok(createdCommentDTO);
     }
 
