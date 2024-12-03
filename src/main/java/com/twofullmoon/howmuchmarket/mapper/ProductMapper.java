@@ -58,6 +58,7 @@ public class ProductMapper {
                 .currentPrice(product.getAuction() != null ? product.getAuction().getCurrentPrice() : product.getPrice())
                 .regTime(product.getRegTime())
                 .dealTime(product.getDealTime())
+                .auctionEndTime(product.getAuction() != null ? product.getAuction().getEndTime() : product.getDealTime())
                 .productStatus(product.getProductStatus())
                 .productDetail(product.getProductDetail())
                 .onAuction(product.getOnAuction())
