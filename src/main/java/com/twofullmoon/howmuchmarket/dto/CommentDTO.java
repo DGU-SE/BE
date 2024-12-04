@@ -10,6 +10,7 @@ import lombok.*;
 public class CommentDTO {
     private Integer productId;
     private String userId;
+    private String userName;
     private String content;
     private boolean secret;
     
