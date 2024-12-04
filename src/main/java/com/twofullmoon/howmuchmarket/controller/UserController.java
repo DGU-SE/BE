@@ -1,86 +1,68 @@
 package com.twofullmoon.howmuchmarket.controller;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.twofullmoon.howmuchmarket.dto.LocationDTO;
-import com.twofullmoon.howmuchmarket.dto.UserDTO;
-import com.twofullmoon.howmuchmarket.entity.Location;
-import com.twofullmoon.howmuchmarket.entity.User;
-import com.twofullmoon.howmuchmarket.service.LocationService;
+import com.twofullmoon.howmuchmarket.dto.UserResponseDTO;
+import com.twofullmoon.howmuchmarket.dto.UserSignupRequestDTO;
+import com.twofullmoon.howmuchmarket.mapper.UserMapper;
 import com.twofullmoon.howmuchmarket.service.UserService;
-
-import jakarta.transaction.Transactional;
+import com.twofullmoon.howmuchmarket.util.JwtUtil;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-	private final UserService userService;
-	private final LocationService locationService;
+    private final UserService userService;
+    private final UserMapper userMapper;
+    private final JwtUtil jwtUtil;
 
-	public UserController(UserService userService, LocationService locationService) {
-		this.userService = userService;
-		this.locationService = locationService;
-	}
+    public UserController(UserService userService, UserMapper userMapper, JwtUtil jwtUtil) {
+        this.userService = userService;
+        this.userMapper = userMapper;
+        this.jwtUtil = jwtUtil;
+    }
 
-	@GetMapping("/{id}")
-	public String getUserById(@PathVariable String id) {
-		return "hi" + id + "1";
-	}
+    @GetMapping("/{id}")
+    public Optional<UserResponseDTO> getUserById(@PathVariable(name = "id") String id) {
+        return userService.findUserById(id)
+                .map(userMapper::toResponseDTO);
+    }
 
-	@Transactional
-	@PostMapping
-	public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO) {
-		LocationDTO locationDTO = userDTO.getLocation();
-		User createdUser;
+    @GetMapping("/id/duplicate")
+    public ResponseEntity<HashMap<String, Boolean>> checkDuplicateId(@RequestParam(name = "id") String id) {
+        boolean isDuplicated = userService.findUserById(id).isPresent();
 
-		if (locationDTO == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
+        HashMap<String, Boolean> response = new HashMap<>();
+        response.put("duplicated", isDuplicated);
 
-		Optional<Location> location = Optional.empty();
-		if (locationDTO.getId() != null) {
-			location = locationService.findLocationById(locationDTO.getId());
-		}
-		
-		if (location.isPresent()) {
-			createdUser = User.builder()
-					.id(userDTO.getId())
-					.pw(userDTO.getPw())
-					.name(userDTO.getName())
-					.accountNumber(userDTO.getAccountNumber())
-					.location(location.get())
-					.build();
-		} else {
-			Location locationData = Location.builder()
-					.longitude(locationDTO.getLongitude())
-					.latitude(locationDTO.getLatitude())
-					.zipcode(locationDTO.getZipcode())
-					.address(locationDTO.getAddress())
-					.addressDetail(locationDTO.getAddressDetail())
-					.build();
+        return ResponseEntity.ok(response);
+    }
 
-			locationService.createLocation(locationData);
+    @PostMapping("/join")
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserSignupRequestDTO userDTO) {
+        UserResponseDTO createdUserDTO = userService.createUser(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(createdUserDTO);
+    }
 
-			createdUser = User.builder()
-					.id(userDTO.getId())
-					.pw(userDTO.getPw())
-					.name(userDTO.getName())
-					.accountNumber(userDTO.getAccountNumber())
-					.location(locationData)
-					.build();
-		}
+    @PatchMapping("/{userId}/location")
+    public ResponseEntity<?> setUserResidence(@PathVariable(name = "userId") String userId,
+                                              @RequestBody LocationDTO locationDTO, @RequestHeader("Authorization") String authorizationHeader) {
 
-		createdUser = userService.createUser(createdUser);
+        String tokenUserId = jwtUtil.extractUserId(authorizationHeader.substring(7));
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-	}
+        if (!tokenUserId.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("userId in token and parameter are not equal.");
+        }
+
+        UserResponseDTO modifiedUserDTO = userService.setUserLocation(tokenUserId, locationDTO);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(modifiedUserDTO);
+    }
 }
