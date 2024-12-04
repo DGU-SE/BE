@@ -22,6 +22,7 @@ public class CommentMapper {
                 .content(comment.getContent())
                 .secret(comment.isSecret())
                 .userId(comment.getUser().getId())
+                .userName(comment.getUser().getName())
                 .productId(comment.getProduct().getId())
                 .build();
     }
